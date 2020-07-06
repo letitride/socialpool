@@ -5,7 +5,9 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"os/signal"
 	"sync"
+	"syscall"
 	"time"
 
 	"github.com/nsqio/go-nsq"
@@ -45,7 +47,7 @@ func main() {
 		log.Println("データベース接続を閉じます...")
 		db.Clone()
 	}()
-	pollData := db.DB("boolots").C("polls")
+	pollData := db.DB("ballots").C("polls")
 
 	var countsLock sync.Mutex
 	var counts map[string]int
@@ -69,7 +71,7 @@ func main() {
 		return nil
 	}))
 	//講読先のサーバ
-	if err := q.ConnectToNSQLookupd("localhost:4161"); err != nil {
+	if err := q.ConnectToNSQD("localhost:4150"); err != nil {
 		fatal(err)
 		return
 	}
@@ -103,4 +105,16 @@ func main() {
 		}
 		updater.Reset(updateDuration)
 	})
+
+	termChan := make(chan os.Signal, 1)
+	signal.Notify(termChan, syscall.SIGINT, syscall.SIGTERM, syscall.SIGHUP)
+	for {
+		select {
+		case <-termChan:
+			updater.Stop()
+			q.Stop()
+		case <-q.StopChan:
+			return
+		}
+	}
 }
