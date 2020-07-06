@@ -111,6 +111,7 @@ func readFromTwitter(votes chan<- string) {
 	}
 	query := make(url.Values)
 	query.Set("track", strings.Join(options, ","))
+	log.Println("生成文字列:", query.Encode())
 	req, err := http.NewRequest("POST", u.String(), strings.NewReader(query.Encode()))
 	if err != nil {
 		log.Println("検索のリクエストの作成に失敗しました:", err)
@@ -122,10 +123,13 @@ func readFromTwitter(votes chan<- string) {
 		return
 	}
 	reader = resp.Body
+	var reader io.Reader = resp.Body
+	//reader = io.TeeReader(reader, os.Stderr)
 	decoder := json.NewDecoder(reader)
 	for {
 		var tweet tweet
 		if err := decoder.Decode(&tweet); err != nil {
+			log.Println("twitterからのレスポンスが不正です:", err)
 			break
 		}
 		for _, option := range options {
