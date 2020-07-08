@@ -71,7 +71,7 @@ func main() {
 		return nil
 	}))
 	//講読先のサーバ
-	if err := q.ConnectToNSQD("localhost:4150"); err != nil {
+	if err := q.ConnectToNSQLookupd("localhost:4161"); err != nil {
 		fatal(err)
 		return
 	}
