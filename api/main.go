@@ -1,11 +1,37 @@
 package main
 
 import (
+	"flag"
+	"github.com/tylerstillwater/graceful"
 	"gopkg.in/mgo.v2"
+	"log"
 	"net/http"
+	"time"
 )
 
-func main() {}
+func main() {
+	var (
+		addr  = flag.String("addr", ":8080", "エンドポイントのアドレス")
+		mongo = flag.String("mongo", "localhost", "MongoDBのアドレス")
+	)
+	flag.Parse()
+	log.Println("MongoDBに接続します", *mongo)
+	mongoInfo := &mgo.DialInfo{
+		Addrs:    []string{*mongo},
+		Username: "root",
+		Password: "example",
+	}
+	db, err := mgo.DialWithInfo(mongoInfo)
+	if err != nil {
+		log.Fatalln("MongoDBへの接続に失敗しました:", err)
+	}
+	defer db.Close()
+	mux := http.NewServeMux()
+	//mux.HandleFunc("/polls/", withCORS(withVars(withData(db, withAPIKey(handlePolls)))))
+	log.Println("Webサーバを開始します:", *addr)
+	graceful.Run(*addr, 1*time.Second, mux)
+	log.Println("停止します")
+}
 
 func withAPIKey(fn http.HandlerFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
