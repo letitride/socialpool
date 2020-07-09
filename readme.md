@@ -1,3 +1,11 @@
+.envにtwitterにdeveloper登録したアプリの各tokenを記述しておく
+```
+SP_TWITTER_KEY=""
+SP_TWITTER_SECRET=""
+SP_TWITTER_ACCESSTOKEN=""
+SP_TWITTER_ACCESSSECRET=""
+```
+
 ```
 $ docker-compose up -d
 ```
