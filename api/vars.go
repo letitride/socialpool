@@ -25,10 +25,11 @@ func CloseVars(r *http.Request) {
 	varsLock.Unlock()
 }
 
-func GetVar(r *http.Request, key string, value interface{}) {
+func GetVar(r *http.Request, key string) interface{} {
 	varsLock.Lock()
-	vars[r][key] = value
+	value := vars[r][key]
 	varsLock.Unlock()
+	return value
 }
 
 func SetVar(r *http.Request, key string, value interface{}) {
