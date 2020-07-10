@@ -20,7 +20,7 @@
   <script>
     $(function () {
       var update = function () {
-        $.get("http://localhost:8080/polls/?Key=abc123", null, mull, "json")
+        $.get("http://localhost:8080/polls/?Key=abc123", null, null, "json")
           .done(function (polls) {
             $("#polls").empty();
             for (var p in polls) {
